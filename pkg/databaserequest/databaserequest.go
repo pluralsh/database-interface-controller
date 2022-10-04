@@ -14,10 +14,11 @@ import (
 
 	"github.com/go-logr/logr"
 	databasev1alpha1 "github.com/pluralsh/database-interface-api/apis/database/v1alpha1"
+	"github.com/pluralsh/database-interface-controller/pkg/kubernetes"
 )
 
 const (
-	DatabaseRequestFinalizer = "pluralsh.database-interface-controller/database-protection"
+	DatabaseRequestFinalizer = "pluralsh.database-interface-controller/databaserequest-protection"
 )
 
 // Reconciler reconciles a DatabaseRequest object
@@ -47,13 +48,8 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 				return ctrl.Result{}, err
 			}
 			log.Info("Successfully deleted database: %s", databaseRequest.Status.DatabaseName)
-			controllerutil.RemoveFinalizer(databaseRequestCopy, DatabaseRequestFinalizer)
-			if err := r.Patch(ctx, databaseRequestCopy, client.MergeFromWithOptions(&databaseRequest, client.MergeFromWithOptimisticLock{})); err != nil {
-				log.Error(err, "Error patching database request")
-				return ctrl.Result{}, err
-			}
-			log.Info("Successfully patched database request")
-			return ctrl.Result{}, nil
+
+			return ctrl.Result{}, kubernetes.TryRemoveFinalizer(ctx, r.Client, databaseRequestCopy, DatabaseRequestFinalizer)
 		}
 	}
 
@@ -80,15 +76,17 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 			databaseRequest.Status.Ready = true
 		}
 
+		kubernetes.TryAddFinalizer(ctx, r.Client, &databaseRequest, DatabaseRequestFinalizer)
+
 		var database databasev1alpha1.Database
 		if err := r.Get(ctx, client.ObjectKey{Name: databaseRequest.Spec.ExistingDatabaseName}, &database); err != nil {
 			log.Error(err, "Can't get database")
 			return ctrl.Result{}, err
 		}
+
 		databaseRequest.Status.DatabaseName = database.Name
-		controllerutil.AddFinalizer(&databaseRequest, DatabaseRequestFinalizer)
-		if err := r.Update(ctx, &databaseRequest); err != nil {
-			log.Error(err, "Can't update database request")
+		if err := r.Status().Update(ctx, &databaseRequest); err != nil {
+			log.Error(err, "Can't update database  status")
 			return ctrl.Result{}, err
 		}
 	}
