@@ -51,6 +51,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 
 			return ctrl.Result{}, kubernetes.TryRemoveFinalizer(ctx, r.Client, databaseRequestCopy, DatabaseRequestFinalizer)
 		}
+		return ctrl.Result{}, nil
 	}
 
 	if !databaseRequest.Status.Ready {
