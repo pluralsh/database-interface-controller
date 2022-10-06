@@ -1,0 +1,9 @@
+apiVersion: database.plural.sh/v1alpha1
+kind: DatabaseAccess
+metadata:
+  name: database-access-sample
+  namespace: default
+spec:
+  databaseRequestName: database-sample
+  databaseAccessClassName: database-access-class-sample
+  credentialsSecretName: database-sample

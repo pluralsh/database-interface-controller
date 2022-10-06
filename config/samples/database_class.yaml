@@ -1,0 +1,6 @@
+apiVersion: database.plural.sh/v1alpha1
+kind: DatabaseClass
+metadata:
+  name: database-class-sample
+driverName: fake.database.plural.sh
+

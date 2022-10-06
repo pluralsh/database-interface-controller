@@ -1,0 +1,6 @@
+apiVersion: database.plural.sh/v1alpha1
+kind: DatabaseAccessClass
+metadata:
+  name: database-access-class-sample
+driverName: fake.database.plural.sh
+authenticationType: login

@@ -41,13 +41,13 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 		databaseRequestCopy := databaseRequest.DeepCopy()
 		if controllerutil.ContainsFinalizer(databaseRequestCopy, DatabaseRequestFinalizer) {
 			database := &databasev1alpha1.Database{
-				ObjectMeta: metav1.ObjectMeta{Name: databaseRequest.Status.DatabaseName},
+				ObjectMeta: metav1.ObjectMeta{Name: databaseRequest.Spec.ExistingDatabaseName},
 			}
 			if err := r.Delete(ctx, database); err != nil {
-				log.Error(err, "Error deleting database %s", databaseRequest.Status.DatabaseName)
+				log.Error(err, "Error deleting database", "Database", databaseRequest.Spec.ExistingDatabaseName)
 				return ctrl.Result{}, err
 			}
-			log.Info("Successfully deleted database: %s", databaseRequest.Status.DatabaseName)
+			log.Info("Successfully deleted database", "Database", databaseRequest.Spec.ExistingDatabaseName)
 
 			return ctrl.Result{}, kubernetes.TryRemoveFinalizer(ctx, r.Client, databaseRequestCopy, DatabaseRequestFinalizer)
 		}
@@ -63,32 +63,32 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 
 			var databaseClass databasev1alpha1.DatabaseClass
 			if err := r.Get(ctx, client.ObjectKey{Name: databaseClassName}, &databaseClass); err != nil {
-				log.Error(err, "Can't get database class %s", databaseClassName)
+				log.Error(err, "Can't get database class", "databaseClass", databaseClassName)
 				return ctrl.Result{}, err
 			}
 
 			newDatabase := genDatabase(databaseRequest, databaseClass)
-			if err := r.Create(ctx, newDatabase); err != nil {
-				log.Error(err, "Can't create database")
+			if err := r.Get(ctx, client.ObjectKey{Name: newDatabase.Name}, &databasev1alpha1.Database{}); err != nil {
+				if !apierrors.IsNotFound(err) {
+					return ctrl.Result{}, nil
+				}
+				if err := r.Create(ctx, newDatabase); err != nil {
+					log.Error(err, "Can't create database")
+					return ctrl.Result{}, err
+				}
+				log.Info("Successfully created database", "Database", newDatabase.Name)
+			}
+			databaseRequest.Spec.ExistingDatabaseName = newDatabase.Name
+			if err := r.Update(ctx, &databaseRequest); err != nil {
+				return ctrl.Result{}, err
+			}
+			if err := kubernetes.TryAddFinalizer(ctx, r.Client, &databaseRequest, DatabaseRequestFinalizer); err != nil {
 				return ctrl.Result{}, err
 			}
 			databaseRequest.Status.Ready = false
-		} else {
-			databaseRequest.Status.Ready = true
-		}
-
-		kubernetes.TryAddFinalizer(ctx, r.Client, &databaseRequest, DatabaseRequestFinalizer)
-
-		var database databasev1alpha1.Database
-		if err := r.Get(ctx, client.ObjectKey{Name: databaseRequest.Spec.ExistingDatabaseName}, &database); err != nil {
-			log.Error(err, "Can't get database")
-			return ctrl.Result{}, err
-		}
-
-		databaseRequest.Status.DatabaseName = database.Name
-		if err := r.Status().Update(ctx, &databaseRequest); err != nil {
-			log.Error(err, "Can't update database  status")
-			return ctrl.Result{}, err
+			if err := r.Status().Update(ctx, &databaseRequest); err != nil {
+				return ctrl.Result{}, err
+			}
 		}
 	}
 

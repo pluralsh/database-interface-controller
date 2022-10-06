@@ -1,0 +1,8 @@
+apiVersion: database.plural.sh/v1alpha1
+kind: DatabaseRequest
+metadata:
+  name: database-sample
+  namespace: default
+spec:
+  databaseClassName: database-class-sample
+  engine: fake
