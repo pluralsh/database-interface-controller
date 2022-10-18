@@ -24,8 +24,8 @@ var (
 )
 
 func init() {
-	utilruntime.Must(databasev1alpha1.AddToScheme(scheme))
 	utilruntime.Must(corev1.AddToScheme(scheme))
+	utilruntime.Must(databasev1alpha1.AddToScheme(scheme))
 }
 
 func main() {
