@@ -1,0 +1,48 @@
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: database-controller-role
+  namespace: default
+  labels:
+    plural.sh/part-of: database-interface
+    plural.sh/component: controller
+    plural.sh/version: main
+    plural.sh/name: database-interface-controller
+rules:
+- apiGroups: ["database.plural.sh"]
+  resources: ["databaserequests", "databaseaccesses", "databaserequests/status", "databaseaccesses/status"]
+  verbs: ["get", "list", "watch", "update"]
+- apiGroups: ["database.plural.sh"]
+  resources: ["databases"]
+  verbs: ["get", "list", "watch", "update", "create", "delete"]
+- apiGroups: ["database.plural.sh"]
+  resources: ["databaseclasses","databaseaccessclasses"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["list", "watch", "create", "update", "patch"]
+- apiGroups: [""]
+  resources: ["configmaps", "serviceaccounts"]
+  verbs: ["list", "get"]
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: database-controller
+  namespace: default
+  labels:
+    plural.sh/part-of: database-interface
+    plural.sh/component: controller
+    plural.sh/version: main
+    plural.sh/name: database-interface-controller
+subjects:
+  - kind: ServiceAccount
+    name: database-controller-sa
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: database-controller-role
+  apiGroup: rbac.authorization.k8s.io
+

@@ -11,17 +11,18 @@ COPY go.sum go.sum
 RUN go mod download
 
 # Copy the go source
-COPY cmd/controller-manager/main.go main.go
-COPY pkg/ pkg/
+COPY /cmd/database-controller/main.go database-controller.go
+COPY /cmd/sidecar-controller/main.go sidecar-controller.go
+COPY /pkg pkg/
 
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} GO111MODULE=on go build -a -o controller-manager main.go
-
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} GO111MODULE=on go build -a -o database-controller database-controller.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} GO111MODULE=on go build -a -o sidecar-controller sidecar-controller.go
 
 FROM gcr.io/distroless/static:nonroot
 WORKDIR /
 
-COPY --from=builder /workspace/controller-manager .
+COPY --from=builder /workspace/database-controller .
+COPY --from=builder /workspace/sidecar-controller .
 USER 65532:65532
-ENTRYPOINT ["/controller-manager"]

@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: database-controller-sa
+  labels:
+    plural.sh/part-of: database-interface
+    plural.sh/component: controller
+    plural.sh/version: main
+    plural.sh/name: database-interface-controller

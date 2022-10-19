@@ -38,15 +38,13 @@ test:
 
 ##@ Build
 
-build: fmt vet ## Build manager binary.
-	go build -o bin/controller-manager cmd/controller-manager/main.go
+build: fmt vet ## Build controllers.
+	go build -o bin/database-controller cmd/database-controller/main.go
+	go build -o bin/sidecar-controller cmd/sidecar-controller/main.go
 
-run: fmt vet ## Run a controller from your host.
-	go run cmd/controller-manager/main.go -zap-log-level 2
-
-docker-build: build ## Build docker image with the manager.
+docker-build: ## Build docker image with the controllers.
 	docker build -t ${IMG} .
 
-docker-push: ## Push docker image with the manager.
+docker-push: ## Push docker image with the controllers.
 	docker push ${IMG}
 

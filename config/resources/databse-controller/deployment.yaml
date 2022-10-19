@@ -1,0 +1,36 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: database-controller
+  labels:
+    plural.sh/part-of: database-interface
+    plural.sh/component: controller
+    plural.sh/version: main
+    plural.sh/name: database-interface-controller
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      plural.sh/part-of: database-interface
+      plural.sh/component: controller
+      plural.sh/version: main
+      plural.sh/name: database-interface-controller
+  template:
+    metadata:
+      labels:
+        plural.sh/part-of: database-interface
+        plural.sh/component: controller
+        plural.sh/version: main
+        plural.sh/name: database-interface-controller
+    spec:
+      serviceAccountName: database-controller-sa
+      containers:
+        - name: database-controller
+          image: ghcr.io/pluralsh/database-interface-controller:latest
+          command: ["./database-controller"]
+          imagePullPolicy: Always

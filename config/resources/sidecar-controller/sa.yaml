@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: database-provisioner-sa
+  namespace: default # must set to default. see https://github.com/kubernetes-sigs/kustomize/issues/1377#issuecomment-694731163
+  labels:
+    plural.sh/part-of: database-interface
+    plural.sh/component: provisioner
+    plural.sh/version: main
+    plural.sh/name: database-interface-provisioner

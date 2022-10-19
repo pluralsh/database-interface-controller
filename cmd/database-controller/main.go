@@ -4,14 +4,12 @@ import (
 	"flag"
 	"os"
 
+	databasev1alpha1 "github.com/pluralsh/database-interface-api/apis/database/v1alpha1"
 	"github.com/pluralsh/database-interface-controller/pkg/databaserequest"
-
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-
-	databasev1alpha1 "github.com/pluralsh/database-interface-api/apis/database/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
 

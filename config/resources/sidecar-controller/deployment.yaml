@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database-provisioner
+  labels:
+    plural.sh/part-of: database-interface
+    plural.sh/component: provisioner
+    plural.sh/version: main
+    plural.sh/name: database-interface-provisioner
+spec:
+  replicas: 1
+  minReadySeconds: 30
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      plural.sh/part-of: database-interface
+      plural.sh/component: provisioner
+      plural.sh/name: database-interface-provisioner
+      plural.sh/version: main
+  template:
+    metadata:
+      labels:
+        plural.sh/part-of: database-interface
+        plural.sh/component: provisioner
+        plural.sh/name: database-interface-provisioner
+        plural.sh/version: main
+    spec:
+      serviceAccountName: database-provisioner-sa
+      volumes:
+        - name: socket
+          emptyDir: {}
+      containers:
+        - name: database-postgres-driver
+          image: ghcr.io/pluralsh/database-postgres-driver:latest
+          envFrom:
+            - secretRef:
+                name: database-provisioner
+          volumeMounts:
+            - mountPath: /var/lib/database
+              name: socket
+        - name: database-provisioner-sidecar
+          image: ghcr.io/pluralsh/database-interface-controller:latest
+          command: ["./sidecar-controller"]
+          envFrom:
+            - secretRef:
+                name: database-provisioner
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - mountPath: /var/lib/database
+              name: socket
