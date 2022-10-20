@@ -24,7 +24,7 @@ rules:
   verbs: ["list", "watch", "create", "update", "patch"]
 - apiGroups: [""]
   resources: ["configmaps", "serviceaccounts"]
-  verbs: ["list", "get"]
+  verbs: ["list", "get", "watch"]
 
 ---
 kind: ClusterRoleBinding

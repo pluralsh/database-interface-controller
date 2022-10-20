@@ -45,7 +45,7 @@ spec:
             - mountPath: /var/lib/database
               name: socket
         - name: database-provisioner-sidecar
-          image: ghcr.io/pluralsh/database-interface-controller:0.0.1
+          image: ghcr.io/pluralsh/database-interface-controller:0.0.2
           command: ["./sidecar-controller"]
           envFrom:
             - secretRef:
