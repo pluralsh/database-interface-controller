@@ -126,10 +126,10 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 				log.Error(err, "Failed to get database request")
 				return ctrl.Result{}, err
 			}
-
-			databaseReq.Status.Ready = true
-			databaseReq.Status.DatabaseName = database.Name
-			if err := r.Status().Update(ctx, &databaseReq); err != nil {
+			databaseReqCopy := databaseReq.DeepCopy()
+			databaseReqCopy.Status.Ready = true
+			databaseReqCopy.Status.DatabaseName = database.Name
+			if err := r.Status().Update(ctx, databaseReqCopy); err != nil {
 				log.Error(err, "Failed to update DatabaseRequest status")
 				return ctrl.Result{}, err
 			}

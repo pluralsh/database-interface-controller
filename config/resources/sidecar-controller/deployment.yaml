@@ -37,7 +37,7 @@ spec:
           emptyDir: {}
       containers:
         - name: database-postgres-driver
-          image: ghcr.io/pluralsh/database-postgres-driver:latest
+          image: ghcr.io/pluralsh/database-postgres-driver:0.0.3
           envFrom:
             - secretRef:
                 name: database-provisioner
@@ -45,7 +45,7 @@ spec:
             - mountPath: /var/lib/database
               name: socket
         - name: database-provisioner-sidecar
-          image: ghcr.io/pluralsh/database-interface-controller:latest
+          image: ghcr.io/pluralsh/database-interface-controller:0.0.1
           command: ["./sidecar-controller"]
           envFrom:
             - secretRef:
