@@ -52,5 +52,60 @@ Deploy CRDs from manifests:
 kubectl create -f config/crd/bases/
 ```
 
+Now it's time to deploy database and sidecar controllers. 
+
+First deploy database-controller
+```bash
+kubectl create -f config/resources/database-controller
+```
+
+Go to `config/resources/sidecar-controller` and update `secret.yaml` file with Postgres parameters:
+
+```yaml
+...
+...
+stringData:
+  DB_HOST: "acid-minimal-cluster"
+  DB_PASSWORD: "password"
+  DB_PORT: "5432"
+  DB_USER: "postgres"
+```
+
+Deploy sidecar-controller together with postgres driver:
+
+```bash
+kubectl create -f config/resources/sidecar-controller
+```
+
+The next step is to create database and get secret wit the credentials. All necessary files you can find here: `config/samples`.
+You have to install DatabaseClass and DatabaseAccessClass:
+
+```bash
+kubectl create -f config/samples/database_class.yaml
+kubectl create -f config/samples/database_access_class.yaml
+```
+
+Now you can deploy database:
+```bash
+kubectl create -f config/samples/database_request.yaml
+```
+
+Check database status:
+
+```bash
+kubectl get databases
+```
+
+When it's ready you can request for the database credentials:
+
+```bash
+kubectl create -f config/samples/database_access_request.yaml
+```
+
+You should be able to get the secret:
+
+```bash
+kubectl get secret database-sample
+```
 
 
