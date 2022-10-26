@@ -105,6 +105,7 @@ func genDatabase(request databasev1alpha1.DatabaseRequest, class databasev1alpha
 				Name:      request.Name,
 				Namespace: request.Namespace,
 			},
+			DeletionPolicy: class.DeletionPolicy,
 		},
 		Status: databasev1alpha1.DatabaseStatus{
 			Ready:      false,

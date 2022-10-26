@@ -158,12 +158,14 @@ func (r *Reconciler) deleteDatabaseOp(ctx context.Context, database *databasev1a
 	if !strings.EqualFold(database.Spec.DriverName, r.DriverName) {
 		return nil
 	}
-	req := &databasespec.DriverDeleteDatabaseRequest{
-		DatabaseId: database.Status.DatabaseID,
-	}
-	if _, err := r.ProvisionerClient.DriverDeleteDatabase(ctx, req); err != nil {
-		if status.Code(err) != codes.NotFound {
-			return err
+	if database.Spec.DeletionPolicy == databasev1alpha1.DeletionPolicyDelete {
+		req := &databasespec.DriverDeleteDatabaseRequest{
+			DatabaseId: database.Status.DatabaseID,
+		}
+		if _, err := r.ProvisionerClient.DriverDeleteDatabase(ctx, req); err != nil {
+			if status.Code(err) != codes.NotFound {
+				return err
+			}
 		}
 	}
 

@@ -3,4 +3,4 @@ kind: DatabaseClass
 metadata:
   name: database-class-sample
 driverName: postgres.database.plural.sh
-
+deletionPolicy: Delete
