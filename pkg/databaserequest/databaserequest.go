@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	crhelperTypes "github.com/pluralsh/controller-reconcile-helper/pkg/types"
+
 	"github.com/go-logr/logr"
 	databasev1alpha1 "github.com/pluralsh/database-interface-api/apis/database/v1alpha1"
 	"github.com/pluralsh/database-interface-controller/pkg/kubernetes"
@@ -110,6 +112,7 @@ func genDatabase(request databasev1alpha1.DatabaseRequest, class databasev1alpha
 		Status: databasev1alpha1.DatabaseStatus{
 			Ready:      false,
 			DatabaseID: "",
+			Conditions: []crhelperTypes.Condition{},
 		},
 	}
 }
