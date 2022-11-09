@@ -16,7 +16,7 @@ require (
 	k8s.io/apiserver v0.25.0
 	k8s.io/client-go v0.25.3
 	k8s.io/klog/v2 v2.70.1
-	sigs.k8s.io/controller-runtime v0.13.0
+	sigs.k8s.io/controller-runtime v0.13.1
 )
 
 require (
