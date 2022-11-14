@@ -30,6 +30,6 @@ spec:
       serviceAccountName: database-controller-sa
       containers:
         - name: database-controller
-          image: ghcr.io/pluralsh/database-interface-controller:0.0.4
+          image: ghcr.io/pluralsh/database-interface-controller:0.0.5
           command: ["./database-controller"]
           imagePullPolicy: Always
