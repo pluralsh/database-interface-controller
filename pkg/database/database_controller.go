@@ -170,15 +170,16 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 		return ctrl.Result{}, err
 	}
 
+	if err := kubernetes.TryAddFinalizer(ctx, r.Client, database, DatabaseFinalizer); err != nil {
+		log.Error(err, "Can't update finalizer")
+		return ctrl.Result{}, err
+	}
+
 	if err := patchDatabase(ctx, patchHelper, database); err != nil {
 		if strings.Contains(err.Error(), genericregistry.OptimisticLockErrorMsg) {
 			return reconcile.Result{RequeueAfter: time.Second * 1}, nil
 		}
 		log.Error(err, "failed to patch Database")
-		return ctrl.Result{}, err
-	}
-	if err := kubernetes.TryAddFinalizer(ctx, r.Client, database, DatabaseFinalizer); err != nil {
-		log.Error(err, "Can't update finalizer")
 		return ctrl.Result{}, err
 	}
 
@@ -189,6 +190,7 @@ func (r *Reconciler) deleteDatabaseOp(ctx context.Context, database *databasev1a
 	if !strings.EqualFold(database.Spec.DriverName, r.DriverName) {
 		return nil
 	}
+
 	if database.Spec.DeletionPolicy == databasev1alpha1.DeletionPolicyDelete {
 		req := &databasespec.DriverDeleteDatabaseRequest{
 			DatabaseId: database.Status.DatabaseID,
