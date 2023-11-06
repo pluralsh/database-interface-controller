@@ -3,7 +3,7 @@ module github.com/pluralsh/database-interface-controller
 go 1.18
 
 require (
-	github.com/go-logr/logr v1.2.3
+	github.com/go-logr/logr v1.2.4
 	github.com/pkg/errors v0.9.1
 	github.com/pluralsh/controller-reconcile-helper v0.0.4
 	github.com/pluralsh/database-interface-api v0.0.6
