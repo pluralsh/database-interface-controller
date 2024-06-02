@@ -9,7 +9,7 @@ require (
 	github.com/pluralsh/database-interface-api v0.0.6
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
-	github.com/spf13/viper v1.13.0
+	github.com/spf13/viper v1.19.0
 	google.golang.org/grpc v1.50.0
 	k8s.io/api v0.25.3
 	k8s.io/apimachinery v0.25.3
